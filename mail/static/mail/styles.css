@@ -7,3 +7,9 @@ textarea {
     border-width: 2px;
     padding: 15px;
 }
+.left   {
+    text-align:left;
+}
+.right  {
+    float: right;
+}

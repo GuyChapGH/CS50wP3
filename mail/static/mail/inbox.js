@@ -80,12 +80,14 @@ function load_mailbox(mailbox) {
         // Create new email_header
         const email_header = document.createElement('div');
         email_header.className='emailHeader';
-        email_header.innerHTML = contents.sender + contents.subject + contents.timestamp;
-
+        // Set background-color to grey if email has been read
+        if (contents.read)  {
+            email_header.style.background = 'gray';
+        }
+        email_header.innerHTML = '<span class="left">' + '<b>' + contents.sender + '</b>' + '  ' + contents.subject + '</span>' + '<span class = "right">' + contents.timestamp + '</span>';
         //Add email_header to DOM
         document.querySelector('#emails-view').append(email_header);
     }
-
 
 
 }
