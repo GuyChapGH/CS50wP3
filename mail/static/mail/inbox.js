@@ -23,6 +23,7 @@ function compose_email() {
 
   // Listen for submit form
   document.querySelector('form').onsubmit = () => {
+
       // Capture values from form
       const recipients = document.querySelector('#compose-recipients').value;
       const subject = document.querySelector('#compose-subject').value;
@@ -77,16 +78,30 @@ function load_mailbox(mailbox) {
 
     // Add a new email_header with given contents to DOM
     function add_email_header(contents)    {
+
         // Create new email_header
         const email_header = document.createElement('div');
+
+        //Style header
         email_header.className='emailHeader';
+
         // Set background-color to grey if email has been read
         if (contents.read)  {
             email_header.style.background = 'gray';
         }
+
+        //Add HTML and style content
         email_header.innerHTML = '<span class="left">' + '<b>' + contents.sender + '</b>' + '  ' + contents.subject + '</span>' + '<span class = "right">' + contents.timestamp + '</span>';
+
+        // Add event handler
+        email_header.addEventListener('click', load_email);
+
         //Add email_header to DOM
         document.querySelector('#emails-view').append(email_header);
+    }
+
+    function load_email()   {
+        console.log('This email has been clicked!');
     }
 
 
