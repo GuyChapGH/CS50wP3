@@ -82,6 +82,9 @@ function load_mailbox(mailbox) {
         // Create new email_header
         const email_header = document.createElement('div');
 
+        //Store email id in div
+        email_header.dataset.id = contents.id;
+
         //Style header
         email_header.className='emailHeader';
 
@@ -94,14 +97,14 @@ function load_mailbox(mailbox) {
         email_header.innerHTML = '<span class="left">' + '<b>' + contents.sender + '</b>' + '  ' + contents.subject + '</span>' + '<span class = "right">' + contents.timestamp + '</span>';
 
         // Add event handler
-        email_header.addEventListener('click', load_email);
+        email_header.addEventListener('click', () => load_email(email_header.dataset.id));
 
         //Add email_header to DOM
         document.querySelector('#emails-view').append(email_header);
     }
 
-    function load_email()   {
-        console.log('This email has been clicked!');
+    function load_email(id)   {
+        console.log(`email ${id} has been clicked!`);
     }
 
 
