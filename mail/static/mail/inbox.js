@@ -15,6 +15,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
+  document.querySelector('#email-display').style.display = 'none';
 
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
@@ -59,6 +60,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector('#email-display').style.display = 'none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -94,7 +96,9 @@ function load_mailbox(mailbox) {
         }
 
         //Add HTML and style content
-        email_header.innerHTML = '<span class="left">' + '<b>' + contents.sender + '</b>' + '  ' + contents.subject + '</span>' + '<span class = "right">' + contents.timestamp + '</span>';
+        email_header.innerHTML = '<span class="left">' + '<b>' + contents.sender +
+                                '</b>' + '  ' + contents.subject + '</span>' +
+                                '<span class = "right">' + contents.timestamp + '</span>';
 
         // Add event handler
         email_header.addEventListener('click', () => load_email(email_header.dataset.id));
@@ -104,7 +108,48 @@ function load_mailbox(mailbox) {
     }
 
     function load_email(id)   {
+
+        // Show the email contents and hide other views
+        document.querySelector('#emails-view').style.display = 'none';
+        document.querySelector('#compose-view').style.display = 'none';
+        document.querySelector('#email-display').style.display = 'block';
+
         console.log(`email ${id} has been clicked!`);
+
+        //Load email using API
+        fetch (`/emails/${id}`)
+        .then(response => response.json())
+        .then(email => {
+
+            //Print email
+            console.log(email);
+
+
+
+        //Create new email_contents div
+        const email_contents = document.createElement('div');
+
+        //Add HTML and style contents
+        email_contents.innerHTML = '<b>' + "From: " + '</b>' + email.sender + '<br>' +
+                                    '<b>' + "To: " + '</b>' + email.recipients + '<br>' +
+                                    '<b>' + "Subject: " + '</b>' + email.subject + '<br>' +
+                                    '<b>' + "Timestamp: " + '</b>' + email.timestamp + '<hr>' +
+                                    email.body;
+
+        //Add email_contents to DOM
+        document.querySelector('#email-display').append(email_contents);
+
+        });
+
+        //Mark email as read by call to API
+        fetch (`/emails/${id}`, {
+            method:'PUT',
+            body: JSON.stringify({
+                read: true
+            })
+        });
+
+
     }
 
 
