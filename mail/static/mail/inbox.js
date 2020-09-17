@@ -125,6 +125,10 @@ function load_mailbox(mailbox) {
             console.log(email);
 
 
+        //Clear any previous content from the div
+        const prev_email_contents = document.querySelector('#email-display');
+        prev_email_contents.innerHTML = '';
+
 
         //Create new email_contents div
         const email_contents = document.createElement('div');
@@ -136,10 +140,15 @@ function load_mailbox(mailbox) {
                                     '<b>' + "Timestamp: " + '</b>' + email.timestamp + '<hr>' +
                                     email.body;
 
+
+
         //Add email_contents to DOM
         document.querySelector('#email-display').append(email_contents);
 
         });
+
+//Put archive/unarchive button and 'PUT' API code in here
+
 
         //Mark email as read by call to API
         fetch (`/emails/${id}`, {
@@ -150,7 +159,10 @@ function load_mailbox(mailbox) {
         });
 
 
+
     }
 
+    //Testing to see if mailbox argument available
+    console.log(mailbox);
 
 }
