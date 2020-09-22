@@ -145,10 +145,21 @@ function load_mailbox(mailbox) {
         //Add email_contents to DOM
         document.querySelector('#email-display').append(email_contents);
 
+        //Put archive/unarchive button and 'PUT' API code in here
+        if (mailbox ==="inbox") {
+            const btn = document.createElement('button');
+            btn.innerHTML = "Archive";
+            btn.className = "btn btn-sm btn-outline-primary";
+
+            btn.addEventListener('click', function()    {
+                console.log('This button was clicked!')
+            });
+
+            document.querySelector('#email-display').append(btn);
+            //console.log('you are in inbox');
+        }
+
         });
-
-//Put archive/unarchive button and 'PUT' API code in here
-
 
         //Mark email as read by call to API
         fetch (`/emails/${id}`, {
@@ -157,8 +168,6 @@ function load_mailbox(mailbox) {
                 read: true
             })
         });
-
-
 
     }
 
