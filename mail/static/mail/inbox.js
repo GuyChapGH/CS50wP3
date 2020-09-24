@@ -145,6 +145,14 @@ function load_mailbox(mailbox) {
         //Add email_contents to DOM
         document.querySelector('#email-display').append(email_contents);
 
+        //Mark email as read by call to API
+        fetch (`/emails/${id}`, {
+            method:'PUT',
+            body: JSON.stringify({
+                read: true
+            })
+        });
+
         //Put archive/unarchive button and 'PUT' API code in here
         if (mailbox ==="inbox") {
             const btn = document.createElement('button');
@@ -152,21 +160,56 @@ function load_mailbox(mailbox) {
             btn.className = "btn btn-sm btn-outline-primary";
 
             btn.addEventListener('click', function()    {
+
+                //Mark email as archived by call to API
+                fetch (`/emails/${id}`, {
+                    method:'PUT',
+                    body: JSON.stringify({
+                        archived: true
+                    })
+                })
+
+                //Load Inbox when PUT request is completed
+                .then(response => load_mailbox('inbox'));
+
+                //Test
                 console.log('This button was clicked!')
+
             });
 
             document.querySelector('#email-display').append(btn);
             //console.log('you are in inbox');
         }
 
-        });
+        //Put archive/unarchive button and 'PUT' API code in here
+        if (mailbox ==="archive") {
+            const btn = document.createElement('button');
+            btn.innerHTML = "Unarchive";
+            btn.className = "btn btn-sm btn-outline-primary";
 
-        //Mark email as read by call to API
-        fetch (`/emails/${id}`, {
-            method:'PUT',
-            body: JSON.stringify({
-                read: true
-            })
+            btn.addEventListener('click', function()    {
+
+                //Mark email as unarchived by call to API
+                fetch (`/emails/${id}`, {
+                    method:'PUT',
+                    body: JSON.stringify({
+                        archived: false
+                    })
+                })
+
+                //Load inbox when PUT request completed
+                .then(response => load_mailbox('inbox'));
+
+                //Test
+                console.log('This button was clicked!')
+            });
+
+
+            document.querySelector('#email-display').append(btn);
+            //console.log('you are in inbox');
+        }
+
+
         });
 
     }
