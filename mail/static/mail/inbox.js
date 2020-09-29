@@ -153,6 +153,29 @@ function load_mailbox(mailbox) {
             })
         });
 
+        //Reply button feature
+        const reply_btn = document.createElement('button');
+        reply_btn.innerHTML = "Reply";
+        reply_btn.className = "btn btn-sm btn-outline-primary";
+
+        reply_btn.addEventListener('click', function()    {
+
+            compose_email()
+            //Pre-fill compose_email form
+            document.querySelector('#compose-recipients').value = email.sender;
+
+            // TO HERE Need to add test to see if first three characters are 'Re:'
+            document.querySelector('#compose-subject').value = 'test';
+
+            //Pre fill body of email reply
+            document.querySelector('#compose-body').value = '"On ' + email.timestamp + ' ' + email.sender +
+                                                            ' wrote: " ' + email.body;
+
+        });
+
+        //Add reply button to div
+        document.querySelector('#email-display').append(reply_btn);
+
         //Put archive/unarchive button and 'PUT' API code in here
         if (mailbox ==="inbox") {
             const btn = document.createElement('button');
@@ -214,7 +237,5 @@ function load_mailbox(mailbox) {
 
     }
 
-    //Testing to see if mailbox argument available
-    console.log(mailbox);
 
 }
