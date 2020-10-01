@@ -73,7 +73,7 @@ function load_mailbox(mailbox) {
       // Print emails
       console.log(emails);
 
-      // Do something else with emails
+      // Call add_email_header function for each email
       emails.forEach(add_email_header);
 
   });
@@ -100,7 +100,7 @@ function load_mailbox(mailbox) {
                                 '</b>' + '  ' + contents.subject + '</span>' +
                                 '<span class = "right">' + contents.timestamp + '</span>';
 
-        // Add event handler
+        // Add event handler and load_email if clicked on
         email_header.addEventListener('click', () => load_email(email_header.dataset.id));
 
         //Add email_header to DOM
@@ -160,23 +160,28 @@ function load_mailbox(mailbox) {
 
         reply_btn.addEventListener('click', function()    {
 
+            //Call compose_email form
             compose_email()
             //Pre-fill compose_email form
             document.querySelector('#compose-recipients').value = email.sender;
 
-            // TO HERE Need to add test to see if first three characters are 'Re:'
-            document.querySelector('#compose-subject').value = 'test';
+            //Need to add test to see if first four characters are 'Re: ', if not add them
+            if (email.subject.substring(0,4) !== 'Re: ')    {
+                document.querySelector('#compose-subject').value = 'Re: ' + email.subject;
+            } else {
+                document.querySelector('#compose-subject').value = email.subject;
+            }
 
             //Pre fill body of email reply
-            document.querySelector('#compose-body').value = '"On ' + email.timestamp + ' ' + email.sender +
-                                                            ' wrote: " ' + email.body;
+            document.querySelector('#compose-body').value = 'On ' + email.timestamp + ' ' + email.sender +
+                                                            ' wrote: ' + email.body;
 
         });
 
         //Add reply button to div
         document.querySelector('#email-display').append(reply_btn);
 
-        //Put archive/unarchive button and 'PUT' API code in here
+        //Archive button and 'PUT' API code
         if (mailbox ==="inbox") {
             const btn = document.createElement('button');
             btn.innerHTML = "Archive";
@@ -195,16 +200,13 @@ function load_mailbox(mailbox) {
                 //Load Inbox when PUT request is completed
                 .then(response => load_mailbox('inbox'));
 
-                //Test
-                console.log('This button was clicked!')
-
             });
-
+            //Add Archive button to div
             document.querySelector('#email-display').append(btn);
-            //console.log('you are in inbox');
+
         }
 
-        //Put archive/unarchive button and 'PUT' API code in here
+        //Unarchive button and 'PUT' API code
         if (mailbox ==="archive") {
             const btn = document.createElement('button');
             btn.innerHTML = "Unarchive";
@@ -223,13 +225,12 @@ function load_mailbox(mailbox) {
                 //Load inbox when PUT request completed
                 .then(response => load_mailbox('inbox'));
 
-                //Test
-                console.log('This button was clicked!')
+
             });
 
-
+            //Add Unarchive button to div
             document.querySelector('#email-display').append(btn);
-            //console.log('you are in inbox');
+
         }
 
 
