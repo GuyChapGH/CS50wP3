@@ -41,9 +41,19 @@ function compose_email() {
       })
       .then(response=> response.json())
       .then(result => {
-          // Print result
-          console.log(result);
+
+          //Error handling
+          if (result.message !== undefined) {
+              // Print result
+              console.log(result);
+          } else {
+              alert ('Error: ' + result.error);
+          }
+
       });
+
+      //Load Sent Mailbox when POST request is completed
+      //.then(response => load_mailbox('sent'));
 
       // Load user's SENT mailbox HERE.
       load_mailbox('sent');
@@ -54,6 +64,8 @@ function compose_email() {
     }
 
 }
+
+
 
 function load_mailbox(mailbox) {
 
@@ -66,15 +78,15 @@ function load_mailbox(mailbox) {
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
 
   // Load emails using API
-
   fetch (`/emails/${mailbox}`)
   .then(response => response.json())
   .then(emails => {
-      // Print emails
-      console.log(emails);
 
-      // Call add_email_header function for each email
-      emails.forEach(add_email_header);
+          // Print emails
+          console.log(emails);
+
+          // Call add_email_header function for each email
+          emails.forEach(add_email_header);
 
   });
 
@@ -107,6 +119,8 @@ function load_mailbox(mailbox) {
         document.querySelector('#emails-view').append(email_header);
     }
 
+
+
     function load_email(id)   {
 
         // Show the email contents and hide other views
@@ -114,27 +128,22 @@ function load_mailbox(mailbox) {
         document.querySelector('#compose-view').style.display = 'none';
         document.querySelector('#email-display').style.display = 'block';
 
-        console.log(`email ${id} has been clicked!`);
 
         //Load email using API
         fetch (`/emails/${id}`)
         .then(response => response.json())
         .then(email => {
 
-            //Print email
-            console.log(email);
+            //Clear any previous content from the div
+            const prev_email_contents = document.querySelector('#email-display');
+            prev_email_contents.innerHTML = '';
 
 
-        //Clear any previous content from the div
-        const prev_email_contents = document.querySelector('#email-display');
-        prev_email_contents.innerHTML = '';
+            //Create new email_contents div
+            const email_contents = document.createElement('div');
 
-
-        //Create new email_contents div
-        const email_contents = document.createElement('div');
-
-        //Add HTML and style contents
-        email_contents.innerHTML = '<b>' + "From: " + '</b>' + email.sender + '<br>' +
+            //Add HTML and style contents
+            email_contents.innerHTML = '<b>' + "From: " + '</b>' + email.sender + '<br>' +
                                     '<b>' + "To: " + '</b>' + email.recipients + '<br>' +
                                     '<b>' + "Subject: " + '</b>' + email.subject + '<br>' +
                                     '<b>' + "Timestamp: " + '</b>' + email.timestamp + '<hr>' +
@@ -142,30 +151,31 @@ function load_mailbox(mailbox) {
 
 
 
-        //Add email_contents to DOM
-        document.querySelector('#email-display').append(email_contents);
+            //Add email_contents to DOM
+            document.querySelector('#email-display').append(email_contents);
 
-        //Mark email as read by call to API
-        fetch (`/emails/${id}`, {
-            method:'PUT',
-            body: JSON.stringify({
-                read: true
-            })
-        });
+            //Mark email as read by call to API
+            fetch (`/emails/${id}`, {
+                method:'PUT',
+                body: JSON.stringify({
+                    read: true
+                })
+            });
 
-        //Reply button feature
-        const reply_btn = document.createElement('button');
-        reply_btn.innerHTML = "Reply";
-        reply_btn.className = "btn btn-sm btn-outline-primary";
+            //Reply button feature
+            const reply_btn = document.createElement('button');
+            reply_btn.innerHTML = "Reply";
+            reply_btn.className = "btn btn-sm btn-outline-primary";
 
-        reply_btn.addEventListener('click', function()    {
+            reply_btn.addEventListener('click', function()    {
 
             //Call compose_email form
             compose_email()
+
             //Pre-fill compose_email form
             document.querySelector('#compose-recipients').value = email.sender;
 
-            //Need to add test to see if first four characters are 'Re: ', if not add them
+            //Test to see if first four characters are 'Re: ', if not add them
             if (email.subject.substring(0,4) !== 'Re: ')    {
                 document.querySelector('#compose-subject').value = 'Re: ' + email.subject;
             } else {
@@ -176,67 +186,66 @@ function load_mailbox(mailbox) {
             document.querySelector('#compose-body').value = 'On ' + email.timestamp + ' ' + email.sender +
                                                             ' wrote: ' + email.body;
 
-        });
-
-        //Add reply button to div
-        document.querySelector('#email-display').append(reply_btn);
-
-        //Archive button and 'PUT' API code
-        if (mailbox ==="inbox") {
-            const btn = document.createElement('button');
-            btn.innerHTML = "Archive";
-            btn.className = "btn btn-sm btn-outline-primary";
-
-            btn.addEventListener('click', function()    {
-
-                //Mark email as archived by call to API
-                fetch (`/emails/${id}`, {
-                    method:'PUT',
-                    body: JSON.stringify({
-                        archived: true
-                    })
-                })
-
-                //Load Inbox when PUT request is completed
-                .then(response => load_mailbox('inbox'));
-
-            });
-            //Add Archive button to div
-            document.querySelector('#email-display').append(btn);
-
-        }
-
-        //Unarchive button and 'PUT' API code
-        if (mailbox ==="archive") {
-            const btn = document.createElement('button');
-            btn.innerHTML = "Unarchive";
-            btn.className = "btn btn-sm btn-outline-primary";
-
-            btn.addEventListener('click', function()    {
-
-                //Mark email as unarchived by call to API
-                fetch (`/emails/${id}`, {
-                    method:'PUT',
-                    body: JSON.stringify({
-                        archived: false
-                    })
-                })
-
-                //Load inbox when PUT request completed
-                .then(response => load_mailbox('inbox'));
-
-
             });
 
-            //Add Unarchive button to div
-            document.querySelector('#email-display').append(btn);
+            //Add reply button to div
+            document.querySelector('#email-display').append(reply_btn);
 
-        }
+            //Archive button and 'PUT' API code
+            if (mailbox ==="inbox") {
+                const btn = document.createElement('button');
+                btn.innerHTML = "Archive";
+                btn.className = "btn btn-sm btn-outline-primary";
+
+                btn.addEventListener('click', function()    {
+
+                    //Mark email as archived by call to API
+                    fetch (`/emails/${id}`, {
+                        method:'PUT',
+                        body: JSON.stringify({
+                            archived: true
+                        })
+                    })
+
+                    //Load Inbox when PUT request is completed
+                    .then(response => load_mailbox('inbox'));
+
+                });
+
+                //Add Archive button to div
+                document.querySelector('#email-display').append(btn);
+
+            }
+
+            //Unarchive button and 'PUT' API code
+            if (mailbox ==="archive") {
+                const btn = document.createElement('button');
+                btn.innerHTML = "Unarchive";
+                btn.className = "btn btn-sm btn-outline-primary";
+
+                btn.addEventListener('click', function()    {
+
+                    //Mark email as unarchived by call to API
+                    fetch (`/emails/${id}`, {
+                        method:'PUT',
+                        body: JSON.stringify({
+                            archived: false
+                        })
+                    })
+
+                    //Load inbox when PUT request completed
+                    .then(response => load_mailbox('inbox'));
+
+                });
+
+                //Add Unarchive button to div
+                document.querySelector('#email-display').append(btn);
+
+            }
 
 
         });
 
     }
-
 
 }
