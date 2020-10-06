@@ -39,24 +39,27 @@ function compose_email() {
               body:`${body}`
           })
       })
-      .then(response=> response.json())
-      .then(result => {
+        .then(response=> response.json())
+        .then(result => {
 
           //Error handling
           if (result.message !== undefined) {
               // Print result
               console.log(result);
+
           } else {
               alert ('Error: ' + result.error);
           }
 
-      });
+      })
 
       //Load Sent Mailbox when POST request is completed
-      //.then(response => load_mailbox('sent'));
+         .then(() => {
+              load_mailbox('sent');
+          });
 
       // Load user's SENT mailbox HERE.
-      load_mailbox('sent');
+      //load_mailbox('sent');
 
       // Prevent default submission of form
       return false;
